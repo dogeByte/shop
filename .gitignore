@@ -1,0 +1,14 @@
+src/main/webapp/WEB-INF/views/
+src/main/webapp/WEB-INF/static/img/
+out/
+
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# Package Files #
+*.jar
+
+jdbc.properties
