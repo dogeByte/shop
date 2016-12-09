@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+	<constant name="struts.custom.i18n.resources" value="config"/>
+	<constant name="struts.devMode" value="true"/>
+	<constant name="struts.serve.static.browserCache" value="false"/>
+	<constant name="struts.ui.theme" value="simple"/>
+	<constant name="struts.xwork.chaining.copyErrors" value="true"/>
+	<constant name="struts.xwork.chaining.copyFieldErrors" value="true"/>
+	<constant name="struts.xwork.chaining.copyMessages" value="true"/>
+	<package name="default" namespace="/" extends="json-default">
+
+		<!-- 拦截器声明 -->
+		<interceptors>
+			<!-- 后台管理权限控制 自动登录 -->
+			<interceptor name="userIntercetor"
+				class="com.jing.interceptor.UserInterceptor"/>
+
+			<!-- 前台权限控制 -->
+			<interceptor name="clientInterceptor"
+				class="com.jing.interceptor.ClientInterceptor"/>
+		</interceptors>
+
+		<!-- 客户端首页 -->
+		<action name="index" class="com.jing.web.IndexAction">
+			<result>/index.jsp</result>
+		</action>
+
+		<!-- 验证码生成/校验 -->
+		<action name="captcha_*" class="com.jing.web.CaptchaAction"
+			method="{1}">
+		</action>
+
+		<!-- 一级分类 -->
+		<action name="category1_*" class="com.jing.web.Category1Action"
+			method="{1}">
+			<result name="findAllSuccess" type="json">
+				<param name="root">category1s</param>
+			</result>
+		</action>
+
+		<!-- 二级分类 -->
+		<action name="category2_*" class="com.jing.web.Category2Action"
+			method="{1}">
+			<result name="findCategory2sByCategory1IdSuccess" type="json">
+				<param name="root">category2s</param>
+			</result>
+		</action>
+
+		<!-- 后台用户 -->
+		<action name="user_*" class="com.jing.web.UserAction" method="{1}">
+			<result name="loginSuccess" type="redirect">/manage/home.jsp</result>
+			<result name="loginFailure">/manage/login.jsp</result>
+			<result name="logoutSuccess" type="redirect">/manage/login.jsp</result>
+		</action>
+
+		<!-- 后台管理首页，根据是否登录选择跳转 -->
+		<action name="manage" class="com.jing.web.ManageAction">
+			<interceptor-ref name="userIntercetor"/>
+			<interceptor-ref name="defaultStack"/>
+			<result type="redirect">/manage/home.jsp</result>
+			<result name="userPrivilegeFailure" type="redirect">/manage/login.jsp</result>
+		</action>
+
+		<!-- 前台用户 -->
+		<action name="client_*" class="com.jing.web.ClientAction"
+			method="{1}">
+			<interceptor-ref name="clientInterceptor">
+				<param name="includeMethods">logout</param>
+			</interceptor-ref>
+			<interceptor-ref name="userIntercetor">
+				<param name="includeMethods">show</param>
+			</interceptor-ref>
+			<interceptor-ref name="defaultStack"/>
+			<result name="clientPrivilegeFailure">/login.jsp</result>
+			<result name="userPrivilegeFailure">/manage/login.jsp</result>
+			<result name="registerSuccess" type="redirectAction">index</result>
+			<result name="registerFailure">/register.jsp</result>
+			<result name="loginSuccess" type="redirectAction">index</result>
+			<result name="loginFailure">/login.jsp</result>
+			<result name="activateSuccess" type="redirect">/login.jsp</result>
+			<result name="activateFailure">/register.jsp</result>
+			<result name="logoutSuccess" type="redirect">/login.jsp</result>
+			<result name="showSuccess">/manage/client.jsp</result>
+		</action>
+
+		<!-- 购物车 -->
+		<action name="cart_*" class="com.jing.web.CartAction" method="{1}">
+			<interceptor-ref name="clientInterceptor">
+				<param name="includeMethods">add,clear,delete,show,update</param>
+			</interceptor-ref>
+			<interceptor-ref name="defaultStack"/>
+			<result type="redirectAction">
+				<param name="actionName">cart_show</param>
+				<param name="id">${#session.client.id}</param>
+			</result>
+			<result name="clientPrivilegeFailure">/login.jsp</result>
+			<result name="showSuccess">/cart.jsp</result>
+		</action>
+
+		<!-- 订单 -->
+		<action name="order_*" class="com.jing.web.OrderAction" method="{1}">
+			<interceptor-ref name="clientInterceptor">
+				<param name="includeMethods">add,show,pay1,pay2</param>
+			</interceptor-ref>
+			<interceptor-ref name="userIntercetor">
+				<param name="includeMethods">findByClientId,findAll,find</param>
+			</interceptor-ref>
+			<interceptor-ref name="defaultStack"/>
+			<result name="clientPrivilegeFailure">/login.jsp</result>
+			<result name="userPrivilegeFailure">/manage/login.jsp</result>
+			<result name="addSuccess" type="chain">order_show</result>
+			<result name="addFailure">/orderConfirm.jsp</result>
+			<result name="showSuccess">/order.jsp</result>
+			<result name="showFailure" type="redirect">/order.jsp</result>
+			<result name="pay1Success">/pay.jsp</result>
+			<result name="pay2Success" type="chain">order_show</result>
+			<result name="payFailure">/pay.jsp</result>
+			<result name="findSuccess">/manage/order.jsp</result>
+		</action>
+
+		<!-- 商品 -->
+		<action name="good_*" class="com.jing.web.GoodAction" method="{1}">
+			<interceptor-ref name="userIntercetor">
+				<param name="includeMethods">addPage,add,showPage,updatePage,update,delete</param>
+			</interceptor-ref>
+			<interceptor-ref name="defaultStack">
+				<param name="fileUpload.allowedExtensions">bmp,dib,gif,jpeg,jpg,png,rle,tiff</param>
+			</interceptor-ref>
+			<result name="userPrivilegeFailure">/manage/login.jsp</result>
+			<result name="addPageSuccess">/manage/good_add.jsp</result>
+			<result name="addSuccess" type="redirectAction">
+				<param name="actionName">good_showPage</param>
+				<param name="currentPage">${page.currentPage}</param>
+				<param name="limit">${page.limit}</param>
+			</result>
+			<result name="addFailure" type="chain">good_addPage</result>
+			<result name="showPageSuccess">/manage/good_show.jsp</result>
+			<result name="updatePageSuccess">/manage/good_update.jsp</result>
+			<result name="updateSuccess" type="redirectAction">
+				<param name="actionName">good_showPage</param>
+				<param name="currentPage">${page.currentPage}</param>
+				<param name="limit">${page.limit}</param>
+			</result>
+			<result name="updateFailure">/manage/good_update.jsp</result>
+			<result name="deleteSuccess" type="redirectAction">
+				<param name="actionName">good_showPage</param>
+				<param name="currentPage">${page.currentPage}</param>
+				<param name="limit">${page.limit}</param>
+			</result>
+			<result name="listByCategory1IdPageSuccess">/list.jsp</result>
+			<result name="listByCategory2IdPageSuccess">/list.jsp</result>
+			<result name="detailSuccess">/detail.jsp</result>
+			<exception-mapping result="error" exception="org.springframework.dao.DataIntegrityViolationException"/>
+			<result name="error">/manage/error.jsp</result>
+		</action>
+
+	</package>
+</struts>
