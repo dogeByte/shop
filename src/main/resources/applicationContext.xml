@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop
+			http://www.springframework.org/schema/aop/spring-aop.xsd
+			http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/context
+			http://www.springframework.org/schema/context/spring-context.xsd
+			http://www.springframework.org/schema/tx 
+			http://www.springframework.org/schema/tx/spring-tx.xsd">
+	<aop:aspectj-autoproxy/>
+	<context:annotation-config/>
+	<tx:annotation-driven/>
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean"
+		p:configLocation="classpath:hibernate.cfg.xml"/>
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager"
+		p:sessionFactory-ref="sessionFactory"/>
+		
+	<bean id="clientDao" class="com.jing.dao.ClientDao"
+		p:sessionFactory-ref="sessionFactory"/>
+	<bean id="clientService" class="com.jing.service.ClientService"
+		p:clientDao-ref="clientDao"/>
+	<bean id="clientAction" class="com.jing.web.ClientAction"
+		p:clientService-ref="clientService" scope="prototype"/>
+
+	<bean id="category1Dao" class="com.jing.dao.Category1Dao"
+		p:sessionFactory-ref="sessionFactory"/>
+	<bean id="category1Service" class="com.jing.service.Category1Service"
+		p:category1Dao-ref="category1Dao"/>
+	<bean id="category1Action" class="com.jing.web.Category1Action"
+		p:category1Service-ref="category1Service" scope="prototype"/>
+
+	<bean id="category2Dao" class="com.jing.dao.Category2Dao"
+		p:sessionFactory-ref="sessionFactory"/>
+	<bean id="category2Service" class="com.jing.service.Category2Service"
+		p:category2Dao-ref="category2Dao"/>
+	<bean id="category2Action" class="com.jing.web.Category2Action"
+		p:category2Service-ref="category2Service" scope="prototype"/>
+
+	<bean id="goodDao" class="com.jing.dao.GoodDao"
+		p:sessionFactory-ref="sessionFactory"/>
+	<bean id="goodService" class="com.jing.service.GoodService"
+		p:goodDao-ref="goodDao"/>
+	<bean id="goodAction" class="com.jing.web.GoodAction"
+		p:goodService-ref="goodService" p:category1Service-ref="category1Service"
+		scope="prototype"/>
+
+	<bean name="userDao" class="com.jing.dao.UserDao"
+		p:sessionFactory-ref="sessionFactory"/>
+	<bean name="userService" class="com.jing.service.UserService"
+		p:userDao-ref="userDao"/>
+	<bean name="userAction" class="com.jing.web.UserAction"
+		p:userService-ref="userService" scope="prototype"/>
+
+	<bean name="indexAction" class="com.jing.web.IndexAction"
+		p:goodService-ref="goodService" scope="prototype"/>
+
+	<bean name="cartDao" class="com.jing.dao.CartDao"
+		p:sessionFactory-ref="sessionFactory"/>
+	<bean name="cartService" class="com.jing.service.CartService"
+		p:cartDao-ref="cartDao" p:goodDao-ref="goodDao"/>
+	<bean name="cartAction" class="com.jing.web.CartAction"
+		p:cartService-ref="cartService" scope="prototype"/>
+
+	<bean name="orderDao" class="com.jing.dao.OrderDao"
+		p:sessionFactory-ref="sessionFactory"/>
+	<bean name="orderService" class="com.jing.service.OrderService"
+		p:orderDao-ref="orderDao"/>
+	<bean name="orderAction" class="com.jing.web.OrderAction"
+		p:orderService-ref="orderService" scope="prototype"/>
+
+</beans>
