@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.jing.vo.Good" table="good" lazy="false">
+		<id name="id">
+			<generator class="native"/>
+		</id>
+		<property name="name"/>
+		<property name="price"/>
+		<property name="image"/>
+		<property name="isHot"/>
+		<property name="description"/>
+		<property name="time"/>
+		<many-to-one name="category2" class="com.jing.vo.Category2"
+			cascade="none" column="c2no" lazy="false"/>
+		<set name="baskets" cascade="save-update" inverse="true" lazy="false">
+			<key column="gno"/>
+			<one-to-many class="com.jing.vo.Basket"/>
+		</set>
+		<set name="orderItems" cascade="save-update" inverse="true" lazy="false">
+			<key column="gno"/>
+			<one-to-many class="com.jing.vo.OrderItem"/>
+		</set>
+	</class>
+</hibernate-mapping>
