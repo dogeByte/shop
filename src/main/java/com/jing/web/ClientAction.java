@@ -55,7 +55,20 @@ public class ClientAction extends ActionSupport implements ModelDriven<Client>, 
 		this.remember = remember;
 	}
 
-	
+	// 校验验证码
+	private boolean verifyCaptcha() {
+		String captchaReal = (String) session.get("captcha");
+		if (captchaReal == null || captchaReal == "") {
+			this.addActionError("验证码已过期");
+			return false;
+		}
+		session.remove("captcha");
+		if (captcha.toLowerCase().equals(captchaReal.toLowerCase())) {
+			return true;
+		}
+		this.addActionError("验证码错误");
+		return false;
+	}
 
 	@InputConfig(resultName = "registerFailure")
 	public String register() {

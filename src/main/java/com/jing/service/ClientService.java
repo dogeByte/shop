@@ -30,6 +30,10 @@ public class ClientService {
 		Cart cart = new Cart();
 		cart.setClient(client);
 		client.setCart(cart);
+		String emailMsg = "尊敬的" + client.getUsername() + "您好，欢迎注册，请<a href='http://localhost/mall/client_activate?code="
+				+ client.getCode() + "'" + ">点击这里激活</a>，如果链接无法点击，请将下面的网址复制至浏览器地址栏中打开。<br/>"
+				+ "http://localhost/mall/client_activate?code=" + client.getCode();
+		EmailUtils.sendEmail(client.getEmail(), emailMsg);
 		clientDao.register(client);
 	}
 
