@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.jing.vo.Category2" table="category2" lazy="false">
+		<id name="id">
+			<generator class="native"/>
+		</id>
+		<property name="name"/>
+		<many-to-one name="category1" class="com.jing.vo.Category1"
+			column="c1no" cascade="save-update" lazy="false"/>
+		<set name="goods" cascade="save-update" inverse="true" lazy="false">
+			<key column="c2no"/>
+			<one-to-many class="com.jing.vo.Good"/>
+		</set>
+	</class>
+</hibernate-mapping>
