@@ -50,7 +50,12 @@ public class GoodDao extends HibernateDaoSupport {
 		return this.getHibernateTemplate().findByCriteria(criteria, 0, 10);
 	}
 
-
+	@SuppressWarnings("unchecked")
+	public List<Good> findNew() {
+		DetachedCriteria criteria = DetachedCriteria.forClass(Good.class);
+		criteria.addOrder(Order.desc("time"));
+		return this.getHibernateTemplate().findByCriteria(criteria, 0, 10);
+	}
 
 	@SuppressWarnings("unchecked")
 	public List<Good> findByCategory1IdAndPage(Integer category1Id, Page<Good> page) {
@@ -68,6 +73,14 @@ public class GoodDao extends HibernateDaoSupport {
 				"select count(*) from Good g join g.category2 c2 join c2.category1 c1 where c1.id=?", category1Id);
 	}
 	
+	@SuppressWarnings("unchecked")
+	public List<Good> findByCategory2IdAndPage(Integer category2Id, Page<Good> page) {
+		DetachedCriteria criteria = DetachedCriteria.forClass(Good.class);
+		criteria.add(Restrictions.eq("category2.id", category2Id));
+		Integer maxResults = page.getLimit();
+		Integer firstResult = (page.getCurrentPage() - 1) * maxResults;
+		return this.getHibernateTemplate().findByCriteria(criteria, firstResult, maxResults);
+	}
 	
 	public Integer findCountByCategory2Id(Integer category2Id) {
 		return DaoUtils.findCountBySql(this.getHibernateTemplate(),

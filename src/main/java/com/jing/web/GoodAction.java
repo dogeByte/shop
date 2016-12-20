@@ -90,6 +90,80 @@ public class GoodAction extends ActionSupport implements ModelDriven<Good> {
 		this.limit = limit;
 	}
 
+	public String addPage() {
+		List<Category1> category1s = category1Service.findAll();
+		ActionContext.getContext().getValueStack().push(category1s);
+		return "addPageSuccess";
+	}
+
+	@InputConfig(resultName = "addFailure")
+	public String add() {
+		good.setCategory2(category2Service.findCategory2ById(category2Id));
+		if (upload != null) {
+			String hashPath = UploadUtils.getHashPath(uploadFileName);
+			File fullPath = new File(ServletActionContext.getServletContext().getRealPath(hashPath));
+			if (!fullPath.exists()) {
+				fullPath.mkdirs();
+			}
+			String uuidName = UploadUtils.getUuidName(uploadFileName);
+			try {
+				FileUtils.copyFile(upload, new File(fullPath, uuidName));
+			} catch (IOException e) {
+				e.printStackTrace();
+				return "addFailure";
+			}
+			good.setImage(new File(hashPath, uuidName).toString());
+		}
+		goodService.add(good);
+		limit = 10;
+		currentPage = this.goodService.getTotalPage(limit);
+		page = new Page<Good>(currentPage ,limit);
+		return "addSuccess";
+	}
+
+	public String showPage() {
+		page = goodService.findByPage(new Page<Good>(currentPage, limit));
+		return "showPageSuccess";
+	}
+
+	public String updatePage() {
+		good = goodService.findById(good.getId());
+		Set<Category2> category2s = good.getCategory2().getCategory1().getCategory2s();
+		List<Category1> category1s = category1Service.findAll();
+		ActionContext.getContext().getValueStack().push(category2s);
+		ActionContext.getContext().getValueStack().push(category1s);
+		page = new Page<Good>(currentPage, limit);
+		return "updatePageSuccess";
+	}
+
+	@InputConfig(resultName = "updateFailure")
+	public String update() {
+		good.setCategory2(category2Service.findCategory2ById(category2Id));
+		if (upload != null) {
+			String hashPath = UploadUtils.getHashPath(uploadFileName);
+			File fullPath = new File(ServletActionContext.getServletContext().getRealPath(hashPath));
+			if (!fullPath.exists()) {
+				fullPath.mkdirs();
+			}
+			String uuidName = UploadUtils.getUuidName(uploadFileName);
+			try {
+				FileUtils.copyFile(upload, new File(fullPath, uuidName));
+			} catch (IOException e) {
+				e.printStackTrace();
+				return "updateFailure";
+			}
+			good.setImage(new File(hashPath, uuidName).toString());
+		}
+		goodService.update(good);
+		page = new Page<Good>(currentPage, limit);
+		return "updateSuccess";
+	}
+
+	public String delete() {
+		goodService.delete(good);
+		page = new Page<Good>(1, limit);
+		return "deleteSuccess";
+	}
 	
 	private void pushCategory1s() {
 		List<Category1> category1s = category1Service.findAll();
