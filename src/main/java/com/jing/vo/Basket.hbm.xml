@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.jing.vo.Basket" table="basket" lazy="false">
+		<id name="id">
+			<generator class="native"/>
+		</id>
+		<property name="count"/>
+		<property name="subtotal"/>
+		<many-to-one name="cart" class="com.jing.vo.Cart" cascade="none"
+			column="cno" lazy="false"/>
+		<many-to-one name="good" class="com.jing.vo.Good" cascade="none"
+			column="gno" lazy="false"/>
+	</class>
+</hibernate-mapping>
