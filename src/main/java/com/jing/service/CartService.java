@@ -37,6 +37,22 @@ public class CartService {
 		cart.add(basket);
 		cartDao.update(cart);
 	}
+	
+	public void delete(Integer basketId) {
+		Cart cart = cartDao.findByBasketId(basketId);
+		cart.remove(basketId);
+		cartDao.update(cart);
+		cartDao.delete(basketId);
+	}
+
+	public void clear(Integer id) {
+		Cart cart = cartDao.findById(id);
+		for (Basket basket : cart.getBaskets()) {
+			cartDao.delete(basket.getId());
+		}
+		cart.clear();
+		cartDao.update(cart);
+	}
 
 	// 更新一条指定的购物项
 	public void update(Integer basketId, Integer count) {

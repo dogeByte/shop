@@ -59,6 +59,17 @@ public class CartAction extends ActionSupport implements ModelDriven<Cart>, Sess
 		return SUCCESS;
 	}
 
+	public String delete() {
+		cartService.delete(basketId);
+		this.sync();
+		return SUCCESS;
+	}
+
+	public String clear() {
+		cartService.clear(cart.getId());
+		this.sync();
+		return SUCCESS;
+	}
 
 	public String update() throws IOException {
 		cartService.update(basketId, count);
@@ -69,5 +80,13 @@ public class CartAction extends ActionSupport implements ModelDriven<Cart>, Sess
 		return NONE;
 	}
 
+	// session中的购物车和数据库同步
+	private Cart sync() {
+		Client client = (Client) session.get("client");
+		Cart cart = cartService.findById(client.getId());
+		client.setCart(cart);
+		session.put("client", client);
+		return cart;
+	}
 
 }
