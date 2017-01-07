@@ -55,6 +55,20 @@ public class UserAction extends ActionSupport implements ModelDriven<User>, Sess
 			return "loginFailure";
 		}
 		session.put("user", user);
+		if ("自动登录".equals(autoLogin)) {
+			try {
+				username = URLEncoder.encode(username, "utf-8");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+			password = Md5Utils.md5(password);
+			Cookie cookie = new Cookie("autoLogin", username + "::" + password);
+			cookie.setMaxAge(365 * 24 * 60 * 60);
+			cookie.setPath("/");
+			ServletActionContext.getResponse().addCookie(cookie);
+		} else {
+			CookieUtils.delete("autoLogin");
+		}
 		return "loginSuccess";
 	}
 
